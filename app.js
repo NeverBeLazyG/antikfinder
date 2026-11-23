@@ -43,7 +43,7 @@ const state = {
   markers: new Map(),
   originMarker: null,
   radiusCircle: null,
-  currentLayerKey: "voyager"
+  currentLayerKey: "osm"
 };
 
 // DOM elements
@@ -87,21 +87,27 @@ const map = L.map("map", {
 L.control.zoom({ position: "bottomright" }).addTo(map);
 
 const tileLayers = {
-  voyager: L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-    maxZoom: 19
-  }),
-  satellite: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-    attribution: "Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics",
-    maxZoom: 18
-  }),
   osm: L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom: 19
+  }),
+  satellite: L.layerGroup([
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+      attribution: "Tiles &copy; Esri — Maxar, Earthstar Geographics",
+      maxZoom: 18
+    }),
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {
+      maxZoom: 18,
+      opacity: 0.9
+    })
+  ]),
+  topo: L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://www.openstreetmap.org/copyright">OSM</a>)',
+    maxZoom: 17
   })
 };
 
-tileLayers.voyager.addTo(map);
+tileLayers.osm.addTo(map);
 const markerLayer = L.layerGroup().addTo(map);
 
 // Toast helper
