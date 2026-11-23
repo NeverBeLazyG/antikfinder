@@ -223,6 +223,50 @@ body {
   background: #eae4da;
 }
 
+.brand-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-icon {
+  position: relative;
+  background: var(--surface-muted);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+}
+
+.btn-icon:hover {
+  background: #eae4da;
+  border-color: #d6cfc4;
+}
+
+.status-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #16a34a;
+  border: 1.5px solid var(--surface);
+}
+
+.btn-danger {
+  width: 100%;
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+}
+
+.btn-danger:hover {
+  background: #fee2e2;
+}
+
 /* Main Layout */
 .main-layout {
   flex: 1;
@@ -681,6 +725,138 @@ body {
   gap: 8px;
 }
 
+/* Settings Modal */
+.settings-modal {
+  z-index: 980;
+}
+
+.settings-close-light {
+  background: var(--surface-muted);
+  color: var(--text);
+}
+
+.settings-close-light:hover {
+  background: #eae4da;
+}
+
+.settings-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding-right: 36px;
+  margin-bottom: 12px;
+}
+
+.settings-header h2 {
+  margin: 0;
+}
+
+.badge.badge-gmaps {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.settings-intro {
+  margin: 0 0 14px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #3f3a34;
+}
+
+.settings-error {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  font-size: 0.83rem;
+  line-height: 1.4;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.input-with-toggle {
+  display: flex;
+  align-items: center;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 2px 4px 2px 10px;
+}
+
+.input-with-toggle:focus-within {
+  border-color: var(--maps-blue);
+  background: var(--surface);
+}
+
+.input-with-toggle input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.9rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: var(--text);
+  padding: 8px 4px;
+}
+
+.toggle-vis-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px 8px;
+  font-size: 0.95rem;
+  border-radius: 7px;
+}
+
+.toggle-vis-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.settings-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.settings-hints {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.settings-hints p {
+  margin: 0 0 6px;
+  color: var(--text);
+}
+
+.settings-hints ul {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 /* Mobile Responsive Bottom Drawer */
 @media (max-width: 820px) {
   .brand-sub {
@@ -712,6 +888,11 @@ body {
 
   .map-style-switcher {
     bottom: 72px;
+  }
+
+  .leaflet-bottom,
+  .gm-bundled-control-on-bottom {
+    bottom: 68px !important;
   }
 
   .loading-pill {
