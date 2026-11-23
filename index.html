@@ -23,14 +23,23 @@
             <span class="brand-sub">Antike Ruinen &amp; Ausflugsziele</span>
           </div>
         </div>
-        <button id="gps-btn" class="btn btn-primary" type="button" title="Aktuellen Standort ermitteln">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
-            <circle cx="12" cy="12" r="7"></circle>
-          </svg>
-          <span>Mein Standort</span>
-        </button>
+        <div class="brand-actions">
+          <button id="settings-btn" class="btn btn-icon" type="button" title="Karten-Einstellungen & Google Maps API-Key" aria-label="Einstellungen öffnen">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span id="gmaps-dot" class="status-dot hidden" title="Google Maps aktiv"></span>
+          </button>
+          <button id="gps-btn" class="btn btn-primary" type="button" title="Aktuellen Standort ermitteln">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+              <circle cx="12" cy="12" r="7"></circle>
+            </svg>
+            <span>Mein Standort</span>
+          </button>
+        </div>
       </div>
 
       <div class="controls-row">
@@ -156,6 +165,54 @@
         </div>
       </div>
     </article>
+
+    <!-- Settings Modal (Local Google Maps API Key) -->
+    <div id="settings-backdrop" class="detail-backdrop hidden"></div>
+    <section id="settings-modal" class="detail-sheet settings-modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <button id="settings-close" class="detail-close settings-close-light" type="button" aria-label="Schließen">✕</button>
+
+      <div class="detail-body">
+        <div class="settings-header">
+          <h2 id="settings-title">Karten-Einstellungen</h2>
+          <span id="map-provider-badge" class="badge">OpenStreetMap (kostenlos)</span>
+        </div>
+
+        <p class="settings-intro">
+          Optional kannst du hier deinen eigenen <strong>Google Maps API-Key</strong> hinterlegen.
+          Er wird <strong>ausschließlich lokal auf diesem Gerät</strong> im Browser gespeichert und niemals im Code oder auf einem Server abgelegt.
+        </p>
+
+        <div id="settings-error" class="settings-error hidden" role="alert"></div>
+
+        <form id="settings-form" class="settings-form" autocomplete="off">
+          <label for="gmaps-key-input" class="settings-label">Google Maps API-Key</label>
+          <div class="input-with-toggle">
+            <input
+              id="gmaps-key-input"
+              type="password"
+              placeholder="AIzaSy…"
+              spellcheck="false"
+              autocomplete="off"
+            />
+            <button id="toggle-key-visibility" class="toggle-vis-btn" type="button" title="Anzeigen / Verbergen" aria-label="API-Key anzeigen oder verbergen">👁️</button>
+          </div>
+
+          <div class="settings-actions">
+            <button type="submit" class="btn btn-maps">Speichern &amp; Google Maps aktivieren</button>
+            <button id="remove-key-btn" type="button" class="btn btn-danger hidden">Key entfernen (zurück zu OpenStreetMap)</button>
+          </div>
+        </form>
+
+        <div class="settings-hints">
+          <p><strong>Hinweise für Google Cloud:</strong></p>
+          <ul>
+            <li>Erforderlich: <em>Maps JavaScript API</em> aktivieren.</li>
+            <li>Optional: <em>Geocoding API</em> für Google-Ortssuche (sonst automatischer Fallback auf OpenStreetMap).</li>
+            <li>Sicherheitstipp: Key in Google Cloud auf deine Domain (HTTP-Referrer) und ein Tageslimit (Quota) einschränken.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
