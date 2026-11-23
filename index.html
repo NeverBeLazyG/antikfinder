@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#b45309" />
+  <meta name="description" content="Finde antike Ruinen, Antik-Kents und archäologische Stätten in deiner Umgebung und starte direkt die Routenplanung in Google Maps." />
+  <title>AntikFinder – Antike Ruinen entdecken</title>
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <!-- Top Floating Search & Controls Bar -->
+    <header class="top-bar">
+      <div class="brand-row">
+        <div class="brand">
+          <img src="icon.svg" alt="" class="brand-icon" width="30" height="30" />
+          <div class="brand-text">
+            <h1>AntikFinder</h1>
+            <span class="brand-sub">Antike Ruinen &amp; Ausflugsziele</span>
+          </div>
+        </div>
+        <button id="gps-btn" class="btn btn-primary" type="button" title="Aktuellen Standort ermitteln">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+            <circle cx="12" cy="12" r="7"></circle>
+          </svg>
+          <span>Mein Standort</span>
+        </button>
+      </div>
+
+      <div class="controls-row">
+        <form id="search-form" class="search-box" autocomplete="off">
+          <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input id="search-input" type="search" placeholder="Ort suchen (z. B. Antalya, Side, Rom…)" aria-label="Ort suchen" />
+          <button type="submit" class="search-submit" aria-label="Suchen">Los</button>
+        </form>
+
+        <div class="radius-group" role="group" aria-label="Suchradius">
+          <button type="button" class="radius-btn" data-radius="10">10 km</button>
+          <button type="button" class="radius-btn" data-radius="25">25 km</button>
+          <button type="button" class="radius-btn active" data-radius="50">50 km</button>
+          <button type="button" class="radius-btn" data-radius="80">80 km</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Layout: Map + List Panel -->
+    <main class="main-layout">
+      <section class="map-wrap" aria-label="Interaktive Karte">
+        <div id="map"></div>
+
+        <!-- Quick Hint Banner -->
+        <div id="map-hint" class="map-hint">
+          <span>Tippe auf die Karte, um einen Standort zu wählen</span>
+          <div class="quick-cities">
+            <button type="button" class="chip" data-lat="36.8969" data-lng="30.7133" data-name="Antalya">Antalya</button>
+            <button type="button" class="chip" data-lat="36.7675" data-lng="31.3890" data-name="Side">Side</button>
+            <button type="button" class="chip" data-lat="37.9715" data-lng="23.7257" data-name="Athen">Athen</button>
+            <button type="button" class="chip" data-lat="41.8902" data-lng="12.4922" data-name="Rom">Rom</button>
+            <button type="button" class="chip" data-lat="49.7596" data-lng="6.6439" data-name="Trier">Trier</button>
+          </div>
+        </div>
+
+        <!-- Map Style Switcher -->
+        <div class="map-style-switcher" role="group" aria-label="Kartenansicht">
+          <button type="button" class="layer-btn active" data-layer="voyager" title="Kartenansicht">Karte</button>
+          <button type="button" class="layer-btn" data-layer="satellite" title="Satellitenansicht">Satellit</button>
+          <button type="button" class="layer-btn" data-layer="osm" title="OpenStreetMap">OSM</button>
+        </div>
+
+        <!-- Loading Pill -->
+        <div id="loading-pill" class="loading-pill hidden" role="status" aria-live="polite">
+          <span class="spinner"></span>
+          <span id="loading-text">Suche antike Ruinen…</span>
+        </div>
+
+        <!-- Status / Error Toast -->
+        <div id="toast" class="toast hidden" role="alert"></div>
+      </section>
+
+      <!-- Results Drawer / Sidebar -->
+      <aside id="panel" class="panel" aria-label="Gefundene Ruinen">
+        <button id="panel-handle" class="panel-handle" type="button" aria-label="Liste ein- oder ausklappen">
+          <span class="handle-bar"></span>
+        </button>
+
+        <div class="panel-header">
+          <div>
+            <h2 id="results-title">Antike Orte</h2>
+            <p id="results-subtitle" class="muted">Wähle deinen Standort oder tippe auf die Karte</p>
+          </div>
+          <div class="panel-controls">
+            <select id="filter-select" aria-label="Filter">
+              <option value="highlights">Highlights</option>
+              <option value="all">Alle Orte</option>
+            </select>
+            <select id="sort-select" aria-label="Sortierung">
+              <option value="popularity">Bekanntheit</option>
+              <option value="distance">Entfernung</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="results-list" class="results-list">
+          <div class="empty-state">
+            <div class="empty-icon">🏛️</div>
+            <p><strong>Starte deine Entdeckungstour</strong></p>
+            <p class="muted">Nutze oben <em>„Mein Standort“</em>, suche eine Stadt oder tippe einfach irgendwo auf die Karte.</p>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Place Detail Modal / Sheet -->
+    <div id="detail-backdrop" class="detail-backdrop hidden"></div>
+    <article id="detail-sheet" class="detail-sheet hidden" aria-live="polite">
+      <button id="detail-close" class="detail-close" type="button" aria-label="Schließen">✕</button>
+
+      <div id="detail-image-wrap" class="detail-image-wrap hidden">
+        <img id="detail-image" src="" alt="" loading="lazy" />
+      </div>
+
+      <div class="detail-body">
+        <div class="detail-meta">
+          <span id="detail-type" class="badge">Archäologische Stätte</span>
+          <span id="detail-distance" class="distance-tag"></span>
+        </div>
+
+        <h2 id="detail-title"></h2>
+        <p id="detail-desc" class="detail-desc"></p>
+
+        <div class="detail-actions">
+          <a id="btn-route" class="btn btn-maps" href="#" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+            </svg>
+            <span>Route in Google Maps starten</span>
+          </a>
+
+          <div class="detail-sub-actions">
+            <a id="btn-gmaps-view" class="btn btn-secondary" href="#" target="_blank" rel="noopener noreferrer">
+              In Google Maps ansehen
+            </a>
+            <a id="btn-wiki" class="btn btn-secondary hidden" href="#" target="_blank" rel="noopener noreferrer">
+              Wikipedia
+            </a>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
